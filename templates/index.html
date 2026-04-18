@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-ML-Demo - AI Classification Model</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        .result-box {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 15px;
+        }
+        .result-box h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .metric {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 0.9rem;
+        }
+        .prediction-result {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .image-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .image-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-left: 10px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .loading.show {
+            display: block;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .api-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .api-section code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AI-ML-Demo</h1>
+            <p>AI Classification/Prediction Model Application</p>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>Model Training</h2>
+                <div class="form-group">
+                    <label for="n_estimators">Number of Trees (n_estimators)</label>
+                    <input type="number" id="n_estimators" value="100" min="10" max="500">
+                </div>
+                <div class="form-group">
+                    <label for="max_depth">Max Depth (optional)</label>
+                    <input type="number" id="max_depth" placeholder="Leave empty for unlimited" min="1">
+                </div>
+                <button class="btn btn-primary" onclick="trainModel()">Start Training</button>
+                <div id="training-loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Training in progress...</p>
+                </div>
+                <div id="training-result" class="result-box" style="display:none;"></div>
+            </div>
+
+            <div class="card">
+                <h2>Model Prediction</h2>
+                <div class="form-group">
+                    <label for="feature_1">Feature 1</label>
+                    <input type="number" id="feature_1" step="any" value="5.1">
+                </div>
+                <div class="form-group">
+                    <label for="feature_2">Feature 2</label>
+                    <input type="number" id="feature_2" step="any" value="3.5">
+                </div>
+                <div class="form-group">
+                    <label for="feature_3">Feature 3</label>
+                    <input type="number" id="feature_3" step="any" value="1.4">
+                </div>
+                <div class="form-group">
+                    <label for="feature_4">Feature 4</label>
+                    <input type="number" id="feature_4" step="any" value="0.2">
+                </div>
+                <div class="form-group">
+                    <label for="feature_5">Feature 5</label>
+                    <input type="number" id="feature_5" step="any" value="0.5">
+                </div>
+                <button class="btn btn-primary" onclick="predict()">Predict</button>
+                <button class="btn btn-secondary" onclick="checkModelStatus()">Check Model Status</button>
+                <div id="prediction-loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Making prediction...</p>
+                </div>
+                <div id="prediction-result" class="result-box" style="display:none;"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Evaluation Results</h2>
+            <button class="btn btn-primary" onclick="loadMetrics()">Load Metrics</button>
+            <div id="metrics-result" class="result-box" style="display:none;"></div>
+            
+            <div class="image-container">
+                <h3>Confusion Matrix</h3>
+                <img id="confusion-matrix" src="" alt="Confusion Matrix" style="display:none;">
+            </div>
+            
+            <div class="image-container">
+                <h3>Accuracy Curve</h3>
+                <img id="accuracy-curve" src="" alt="Accuracy Curve" style="display:none;">
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>API Documentation</h2>
+            <div class="api-section">
+                <h3>POST /train</h3>
+                <p>Train the model with specified parameters.</p>
+                <code>{"n_estimators": 100, "max_depth": null}</code>
+            </div>
+            <div class="api-section">
+                <h3>POST /predict</h3>
+                <p>Make predictions with the trained model.</p>
+                <code>{"feature_1": 5.1, "feature_2": 3.5, "feature_3": 1.4, "feature_4": 0.2, "feature_5": 0.5}</code>
+            </div>
+            <div class="api-section">
+                <h3>GET /metrics</h3>
+                <p>Get model evaluation metrics.</p>
+            </div>
+            <div class="api-section">
+                <h3>GET /model/status</h3>
+                <p>Check if a trained model exists.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function trainModel() {
+            const nEstimators = document.getElementById('n_estimators').value;
+            const maxDepth = document.getElementById('max_depth').value || null;
+            
+            document.getElementById('training-loading').classList.add('show');
+            document.getElementById('training-result').style.display = 'none';
+            
+            try {
+                const response = await fetch('/train', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        n_estimators: parseInt(nEstimators),
+                        max_depth: maxDepth ? parseInt(maxDepth) : null
+                    })
+                });
+                
+                const data = await response.json();
+                
+                document.getElementById('training-result').style.display = 'block';
+                document.getElementById('training-result').innerHTML = `
+                    <h3>Training Completed <span class="status success">Success</span></h3>
+                    <p><strong>Trees:</strong> ${data.training.n_estimators}</p>
+                    <p><strong>Max Depth:</strong> ${data.training.max_depth || 'Unlimited'}</p>
+                    <p><strong>Final Accuracy:</strong> ${data.training.final_accuracy.toFixed(4)}</p>
+                    <div style="margin-top:10px;">
+                        <span class="metric">Accuracy: ${(data.evaluation.accuracy * 100).toFixed(2)}%</span>
+                        <span class="metric">Precision: ${(data.evaluation.precision * 100).toFixed(2)}%</span>
+                        <span class="metric">Recall: ${(data.evaluation.recall * 100).toFixed(2)}%</span>
+                    </div>
+                `;
+                
+                loadImages();
+            } catch (error) {
+                document.getElementById('training-result').style.display = 'block';
+                document.getElementById('training-result').innerHTML = `
+                    <h3>Training Failed <span class="status error">Error</span></h3>
+                    <p>${error.message}</p>
+                `;
+            } finally {
+                document.getElementById('training-loading').classList.remove('show');
+            }
+        }
+
+        async function predict() {
+            const features = {
+                feature_1: parseFloat(document.getElementById('feature_1').value),
+                feature_2: parseFloat(document.getElementById('feature_2').value),
+                feature_3: parseFloat(document.getElementById('feature_3').value),
+                feature_4: parseFloat(document.getElementById('feature_4').value),
+                feature_5: parseFloat(document.getElementById('feature_5').value)
+            };
+            
+            document.getElementById('prediction-loading').classList.add('show');
+            document.getElementById('prediction-result').style.display = 'none';
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(features)
+                });
+                
+                const data = await response.json();
+                
+                document.getElementById('prediction-result').style.display = 'block';
+                document.getElementById('prediction-result').innerHTML = `
+                    <h3>Prediction Result</h3>
+                    <p class="prediction-result">Class: ${data.prediction}</p>
+                    <p><strong>Probabilities:</strong> ${data.probabilities.map((p, i) => `Class ${i}: ${(p * 100).toFixed(2)}%`).join(', ')}</p>
+                `;
+            } catch (error) {
+                document.getElementById('prediction-result').style.display = 'block';
+                document.getElementById('prediction-result').innerHTML = `
+                    <h3>Prediction Failed <span class="status error">Error</span></h3>
+                    <p>${error.message}</p>
+                `;
+            } finally {
+                document.getElementById('prediction-loading').classList.remove('show');
+            }
+        }
+
+        async function checkModelStatus() {
+            try {
+                const response = await fetch('/model/status');
+                const data = await response.json();
+                
+                alert(`Model Status:\n- Model Exists: ${data.model_exists}\n- Training Completed: ${data.training_completed}`);
+            } catch (error) {
+                alert('Failed to check model status: ' + error.message);
+            }
+        }
+
+        async function loadMetrics() {
+            try {
+                const response = await fetch('/metrics');
+                const data = await response.json();
+                
+                document.getElementById('metrics-result').style.display = 'block';
+                document.getElementById('metrics-result').innerHTML = `
+                    <h3>Model Metrics</h3>
+                    <span class="metric">Accuracy: ${(data.accuracy * 100).toFixed(2)}%</span>
+                    <span class="metric">Precision: ${(data.precision * 100).toFixed(2)}%</span>
+                    <span class="metric">Recall: ${(data.recall * 100).toFixed(2)}%</span>
+                `;
+                
+                loadImages();
+            } catch (error) {
+                document.getElementById('metrics-result').style.display = 'block';
+                document.getElementById('metrics-result').innerHTML = `
+                    <p>No metrics available. Please train the model first.</p>
+                `;
+            }
+        }
+
+        function loadImages() {
+            const timestamp = new Date().getTime();
+            
+            const confusionImg = document.getElementById('confusion-matrix');
+            confusionImg.src = `/static/confusion_matrix.png?t=${timestamp}`;
+            confusionImg.style.display = 'block';
+            confusionImg.onerror = function() { this.style.display = 'none'; };
+            
+            const accuracyImg = document.getElementById('accuracy-curve');
+            accuracyImg.src = `/static/accuracy_curve.png?t=${timestamp}`;
+            accuracyImg.style.display = 'block';
+            accuracyImg.onerror = function() { this.style.display = 'none'; };
+        }
+
+        window.onload = function() {
+            loadImages();
+        };
+    </script>
+</body>
+</html>
