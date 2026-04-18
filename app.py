@@ -31,6 +31,7 @@ os.makedirs(templates_dir, exist_ok=True)
 
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 templates = Jinja2Templates(directory=templates_dir)
+templates.env.cache = None
 
 data_processor = DataProcessor(data_path=os.path.join(BASE_DIR, "data", "dataset.csv"))
 model_trainer = ModelTrainer(model_dir=os.path.join(BASE_DIR, "model"))
@@ -54,12 +55,9 @@ class TrainRequest(BaseModel):
 
 
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
-    return templates.TemplateResponse("index.html", {
-        "request": request,
-        "training_result": training_result,
-        "evaluation_result": evaluation_result
-    })
+async def index():
+    with open(os.path.join(templates_dir, "index.html"), "r") as f:
+        return HTMLResponse(content=f.read())
 
 
 @app.post("/train")

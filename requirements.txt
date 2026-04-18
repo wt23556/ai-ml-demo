@@ -7,3 +7,4 @@ joblib
 matplotlib
 seaborn
 python-multipart
+jinja2

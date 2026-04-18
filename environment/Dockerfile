@@ -1,8 +1,6 @@
-FROM python:3.10-slim
+FROM public.ecr.aws/docker/library/python:3.10-slim
 
 WORKDIR /app
-
-COPY . /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
@@ -10,7 +8,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir -r frozen-requirements.txt
+COPY frozen-requirements.txt .
+RUN pip install --default-timeout=1000 -i https://pypi.tuna.tsinghua.edu.cn/simple -r frozen-requirements.txt
+
+COPY requirements.txt .
+COPY app.py .
+COPY src/ ./src/
+COPY data/ ./data/
+COPY templates/ ./templates/
 
 EXPOSE 8000
 

@@ -1,0 +1,231 @@
+{
+  "summary": {
+    "total": 9,
+    "passed": 8,
+    "failed": 1,
+    "pass_rate": 0.8888888888888888
+  },
+  "details": [
+    {
+      "test_name": "健康检查接口",
+      "status": "PASS",
+      "duration": 0.0121,
+      "details": {
+        "status": "healthy",
+        "service": "AI-ML-Demo"
+      }
+    },
+    {
+      "test_name": "边界值预测测试",
+      "status": "PASS",
+      "duration": 0.2534,
+      "details": [
+        {
+          "case": "极小值",
+          "prediction": 0,
+          "probabilities": [
+            0.91,
+            0.08,
+            0.01
+          ]
+        },
+        {
+          "case": "极大值",
+          "prediction": 2,
+          "probabilities": [
+            0.0,
+            0.0,
+            1.0
+          ]
+        },
+        {
+          "case": "负值输入",
+          "prediction": 0,
+          "probabilities": [
+            0.91,
+            0.08,
+            0.01
+          ]
+        },
+        {
+          "case": "零值输入",
+          "prediction": 0,
+          "probabilities": [
+            0.91,
+            0.08,
+            0.01
+          ]
+        },
+        {
+          "case": "典型鸢尾花0类",
+          "prediction": 0,
+          "probabilities": [
+            1.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "case": "典型鸢尾花1类",
+          "prediction": 2,
+          "probabilities": [
+            0.01,
+            0.42,
+            0.57
+          ]
+        },
+        {
+          "case": "典型鸢尾花2类",
+          "prediction": 2,
+          "probabilities": [
+            0.0,
+            0.0,
+            1.0
+          ]
+        }
+      ]
+    },
+    {
+      "test_name": "错误处理测试",
+      "status": "FAIL",
+      "duration": 0.037,
+      "details": [
+        {
+          "case": "缺少字段",
+          "status_code": 422,
+          "has_error": true
+        },
+        {
+          "case": "字段类型错误",
+          "status_code": 422,
+          "has_error": true
+        },
+        {
+          "case": "缺少feature_1",
+          "status_code": 422,
+          "has_error": true
+        },
+        {
+          "case": "多余字段",
+          "status_code": 200,
+          "has_error": false
+        }
+      ]
+    },
+    {
+      "test_name": "多参数训练测试",
+      "status": "PASS",
+      "duration": 17.223,
+      "details": [
+        {
+          "parameters": "n_estimators=10",
+          "accuracy": 1.0,
+          "training_time": 0.4831,
+          "n_estimators": 10,
+          "max_depth": null
+        },
+        {
+          "parameters": "n_estimators=50",
+          "accuracy": 1.0,
+          "training_time": 1.6067,
+          "n_estimators": 50,
+          "max_depth": null
+        },
+        {
+          "parameters": "n_estimators=200",
+          "accuracy": 1.0,
+          "training_time": 5.9303,
+          "n_estimators": 200,
+          "max_depth": null
+        },
+        {
+          "parameters": "max_depth=2",
+          "accuracy": 1.0,
+          "training_time": 2.9677,
+          "n_estimators": 100,
+          "max_depth": 2
+        },
+        {
+          "parameters": "max_depth=10",
+          "accuracy": 1.0,
+          "training_time": 2.9782,
+          "n_estimators": 100,
+          "max_depth": 10
+        },
+        {
+          "parameters": "默认参数",
+          "accuracy": 1.0,
+          "training_time": 3.2566,
+          "n_estimators": 100,
+          "max_depth": null
+        }
+      ]
+    },
+    {
+      "test_name": "批量预测性能测试",
+      "status": "PASS",
+      "duration": 1.5266,
+      "details": {
+        "total_requests": 50,
+        "successful_requests": 50,
+        "success_rate": "100.00%",
+        "total_time": 1.5266,
+        "avg_time_per_request": 30.53
+      }
+    },
+    {
+      "test_name": "并发预测测试",
+      "status": "PASS",
+      "duration": 0.566,
+      "details": {
+        "concurrent_requests": 20,
+        "success_rate": "100.00%",
+        "total_time": 0.566
+      }
+    },
+    {
+      "test_name": "模型持久化测试",
+      "status": "PASS",
+      "duration": 2.9775,
+      "details": {
+        "model_file_exists": true,
+        "file_size_kb": 111.92,
+        "file_updated": false
+      }
+    },
+    {
+      "test_name": "指标和状态接口测试",
+      "status": "PASS",
+      "duration": 0.0036,
+      "details": {
+        "metrics_status": 200,
+        "metrics": {
+          "accuracy": 1.0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "status_status": 200,
+        "model_status": {
+          "model_exists": true,
+          "model_path": "/Users/tomtang/ai_test/ai-ml-demo/model/random_forest_model.joblib",
+          "training_completed": true
+        }
+      }
+    },
+    {
+      "test_name": "静态文件(可视化图表)测试",
+      "status": "PASS",
+      "duration": 0.0044,
+      "details": {
+        "/static/confusion_matrix.png": {
+          "status_code": 200,
+          "size_bytes": 29448
+        },
+        "/static/accuracy_curve.png": {
+          "status_code": 200,
+          "size_bytes": 35797
+        }
+      }
+    }
+  ]
+}
