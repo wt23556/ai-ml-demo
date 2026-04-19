@@ -17,10 +17,15 @@ class ModelTrainer:
         
         os.makedirs(model_dir, exist_ok=True)
         
-    def train(self, X_train, y_train, n_estimators: int = 100, max_depth: int = None) -> dict:
+    def train(self, X_train, y_train, n_estimators: int = 100, max_depth: int = None,
+              min_samples_split: int = 2, min_samples_leaf: int = 1,
+              max_features: str = "sqrt", bootstrap: bool = True,
+              class_weight: str = None) -> dict:
         logger.info("=" * 50)
         logger.info("Starting model training...")
         logger.info(f"Parameters: n_estimators={n_estimators}, max_depth={max_depth}")
+        logger.info(f"min_samples_split={min_samples_split}, min_samples_leaf={min_samples_leaf}")
+        logger.info(f"max_features={max_features}, bootstrap={bootstrap}, class_weight={class_weight}")
         logger.info(f"Training samples: {X_train.shape[0]}")
         logger.info(f"Features: {X_train.shape[1]}")
         logger.info("=" * 50)
@@ -28,6 +33,11 @@ class ModelTrainer:
         self.model = RandomForestClassifier(
             n_estimators=n_estimators,
             max_depth=max_depth,
+            min_samples_split=min_samples_split,
+            min_samples_leaf=min_samples_leaf,
+            max_features=max_features,
+            bootstrap=bootstrap,
+            class_weight=class_weight,
             random_state=42,
             n_jobs=-1,
             warm_start=True
@@ -53,6 +63,11 @@ class ModelTrainer:
             "status": "success",
             "n_estimators": n_estimators,
             "max_depth": max_depth,
+            "min_samples_split": min_samples_split,
+            "min_samples_leaf": min_samples_leaf,
+            "max_features": max_features,
+            "bootstrap": bootstrap,
+            "class_weight": class_weight,
             "final_accuracy": self.training_history[-1],
             "training_history": self.training_history
         }

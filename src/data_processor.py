@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import logging
@@ -10,10 +11,12 @@ logger = logging.getLogger(__name__)
 
 
 class DataProcessor:
-    def __init__(self, data_path: str = "data/dataset.csv"):
+    def __init__(self, data_path: str = "data/dataset.csv", model_dir: str = "model"):
         self.data_path = data_path
+        self.model_dir = model_dir
         self.scaler = StandardScaler()
         self.feature_names = []
+        os.makedirs(model_dir, exist_ok=True)
         
     def load_data(self) -> pd.DataFrame:
         logger.info(f"Loading data from {self.data_path}")
@@ -61,7 +64,31 @@ class DataProcessor:
         
         return X_train, X_test, y_train, y_test
     
+    def save_scaler(self, filename: str = "scaler.joblib"):
+        scaler_path = os.path.join(self.model_dir, filename)
+        joblib.dump({
+            'scaler': self.scaler,
+            'feature_names': self.feature_names
+        }, scaler_path)
+        logger.info(f"Scaler saved to {scaler_path}")
+    
+    def load_scaler(self, filename: str = "scaler.joblib"):
+        scaler_path = os.path.join(self.model_dir, filename)
+        
+        if not os.path.exists(scaler_path):
+            df = self.load_data()
+            self.preprocess(df)
+            self.save_scaler(filename)
+        else:
+            data = joblib.load(scaler_path)
+            self.scaler = data['scaler']
+            self.feature_names = data['feature_names']
+            logger.info(f"Scaler loaded from {scaler_path}")
+    
     def transform_input(self, data: dict) -> np.ndarray:
+        if not hasattr(self.scaler, 'n_features_in_'):
+            self.load_scaler()
+        
         df = pd.DataFrame([data])
         
         for col in self.feature_names:
