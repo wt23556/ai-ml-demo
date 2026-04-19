@@ -243,13 +243,14 @@
         <div class="card">
             <h2>Evaluation Results</h2>
             <button class="btn btn-primary" onclick="loadMetrics()">Load Metrics</button>
+            <button class="btn btn-secondary" onclick="loadImages(true)">Refresh Images</button>
             <div id="metrics-result" class="result-box" style="display:none;"></div>
-            
+
             <div class="image-container">
                 <h3>Confusion Matrix</h3>
                 <img id="confusion-matrix" src="" alt="Confusion Matrix" style="display:none;">
             </div>
-            
+
             <div class="image-container">
                 <h3>Accuracy Curve</h3>
                 <img id="accuracy-curve" src="" alt="Accuracy Curve" style="display:none;">
@@ -312,7 +313,8 @@
                     </div>
                 `;
                 
-                loadImages();
+                // 延迟加载图片，确保文件已写入
+                setTimeout(() => loadImages(true), 500);
             } catch (error) {
                 document.getElementById('training-result').style.display = 'block';
                 document.getElementById('training-result').innerHTML = `
@@ -395,17 +397,20 @@
             }
         }
 
-        function loadImages() {
+        function loadImages(force = false) {
             const timestamp = new Date().getTime();
+            const cacheBuster = force ? `&force=${Math.random()}` : '';
             
             const confusionImg = document.getElementById('confusion-matrix');
-            confusionImg.src = `/static/confusion_matrix.png?t=${timestamp}`;
-            confusionImg.style.display = 'block';
+            confusionImg.style.display = 'none';
+            confusionImg.src = `/static/confusion_matrix.png?t=${timestamp}${cacheBuster}`;
+            confusionImg.onload = function() { this.style.display = 'block'; };
             confusionImg.onerror = function() { this.style.display = 'none'; };
             
             const accuracyImg = document.getElementById('accuracy-curve');
-            accuracyImg.src = `/static/accuracy_curve.png?t=${timestamp}`;
-            accuracyImg.style.display = 'block';
+            accuracyImg.style.display = 'none';
+            accuracyImg.src = `/static/accuracy_curve.png?t=${timestamp}${cacheBuster}`;
+            accuracyImg.onload = function() { this.style.display = 'block'; };
             accuracyImg.onerror = function() { this.style.display = 'none'; };
         }
 
