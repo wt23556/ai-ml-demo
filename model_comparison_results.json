@@ -1,0 +1,43 @@
+{
+  "dataset": {
+    "samples": 2000,
+    "features": 13,
+    "class_distribution": {
+      "0": 444,
+      "1": 648,
+      "2": 908
+    }
+  },
+  "results": [
+    {
+      "model": "RandomForest",
+      "accuracy": 0.7425,
+      "precision": 0.7406,
+      "recall": 0.7425,
+      "f1_score": 0.7387,
+      "train_time": 2.94,
+      "pred_time": 0.0311
+    },
+    {
+      "model": "Wide&Deep",
+      "accuracy": 0.7525,
+      "precision": 0.7602,
+      "recall": 0.7525,
+      "f1_score": 0.7526,
+      "train_time": 2.85,
+      "pred_time": 0.0006,
+      "final_train_acc": 0.8869
+    },
+    {
+      "model": "DeepFM",
+      "accuracy": 0.8125,
+      "precision": 0.8137,
+      "recall": 0.8125,
+      "f1_score": 0.813,
+      "train_time": 2.08,
+      "pred_time": 0.0005,
+      "final_train_acc": 0.9256
+    }
+  ],
+  "best_model": "DeepFM"
+}
